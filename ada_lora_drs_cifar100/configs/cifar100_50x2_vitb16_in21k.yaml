@@ -1,0 +1,60 @@
+experiment:
+  name: cifar100_50x2_vitb16_in21k
+
+data:
+  root: ./data
+  dataset: cifar100
+  num_classes: 100
+  num_tasks: 50
+  classes_per_task: 2
+  image_size: 224
+  batch_size: 128
+  num_workers: 4
+  normalize: zero_one
+  class_order: random
+  max_train_per_class: null
+  max_test_per_class: null
+
+model:
+  name: vit_base_patch16_224.augreg_in21k
+  fallback_names:
+    - vit_base_patch16_224.orig_in21k
+    - vit_base_patch16_224_in21k
+  pretrained: true
+  allow_random_fallback: false
+  num_classes: 100
+
+lora:
+  rank: 8
+  alpha: 16
+  dropout: 0.0
+  target: kv
+
+training:
+  epochs_per_task: 20
+  optimizer: adam
+  lr: 0.001
+  weight_decay: 0.0
+  amp: true
+  grad_clip: 1.0
+  deterministic: false
+  device: cuda
+
+method:
+  name: ada_lora_drs
+  use_drs: true
+  use_atl: true
+  atl_weight: 0.1
+  atl_margin: 0.5
+  drs_batches: 8
+  drs_energy: 0.95
+  drs_max_rank: 64
+  drs_max_rows_per_batch: 4096
+  drs_project_after_step: true
+  grad_batches: 4
+  rho: 1.0
+  gamma_min: 0.5
+  gamma_max: 1.5
+
+eval:
+  save_checkpoint: true
